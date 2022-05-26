@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const InputBar = () => {
+const InputBar = ({ setHistory, scrollToBottom, history }) => {
   var [value, setValue] = useState("");
   return (
     <div style={styles.bar}>
@@ -11,7 +11,19 @@ const InputBar = () => {
           type="text"
           style={styles.input}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onKeyUp={(e) => {
+            if (e.key == "Enter") {
+              setHistory((old) => [...old, { command: value, id: Date.now() }]);
+              setValue("");
+              setTimeout(() => scrollToBottom(), 100);
+            } else if (e.key == "ArrowUp") {
+              history.length > 0 &&
+                setValue(history[history.length - 1].command);
+            }
+          }}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
           placeholder="type your command here"
         />
         <i></i>

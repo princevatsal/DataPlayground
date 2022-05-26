@@ -1,12 +1,87 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import InputBar from "../components/atomic/inputBar";
 import CommandResult from "../components/atomic/commandResult";
 import StaticInputBar from "../components/atomic/staticInputBar";
 import HelpUtility from "../components/molecular/helpUtility";
 import QueryUtility from "../components/molecular/queriesUtility";
 import TablesUtility from "../components/molecular/tablesUtility";
+import Categories from "../assets/json/categories.json";
+import Customers from "../assets/json/customers.json";
+import Suppliers from "../assets/json/suppliers.json";
+import Products from "../assets/json/products.json";
+import Shippers from "../assets/json/shippers.json";
 import "../css/home.css";
 const Home = () => {
+  const [history, setHistory] = useState([]);
+  const terminalRef = useRef(null);
+  const scrollToBottom = () => {
+    terminalRef.current.scrollIntoView(false, { behavior: "smooth" });
+  };
+  const tables = {
+    CATEGORIES: Categories,
+    CUSTOMERS: Customers,
+    SUPPLIERS: Suppliers,
+    PRODUCTS: Products,
+    SHIPPERS: Shippers,
+  };
+  const commandParser = (command) => {
+    //SELECT , INSERT , UPDATE , DELETE
+
+    let parameters = {};
+    command = command.toUpperCase().trim();
+    console.log("parsing for ", command);
+    if (command.startsWith("SELECT")) {
+      // SELECT * FROM STUDENTS
+      // SELECT NAME FROM STUDENTS
+      // SELECT NAME,AGE FROM STUDENTS
+      // SELECT NAME, AGE FROM STUDENTS
+      // SELECT NAME , AGE FROM STUDENTS
+      // SELECT NAME ,AGE FROM STUDNETS
+      // SELECT NAME,AGE,CLASS FROM STUDENTS
+      var fieldsRequired = command
+        .slice(6, command.indexOf("FROM") != -1 ? command.indexOf("FROM") : 0)
+        .split(",")
+        .map((i) => i.trim());
+      fieldsRequired = fieldsRequired.filter((field) => field != "");
+
+      var tableName = command
+        .slice(command.indexOf("FROM") + 4, command.length)
+        .trim();
+
+      if (fieldsRequired.length == 0) {
+        parameters["error"] = true;
+        parameters["errorMessage"] = "Please enter columns required";
+      } else if (!tableName || tableName.length == 0) {
+        parameters["error"] = true;
+        parameters["errorMessage"] = "Please enter table name";
+      } else if (
+        !Object.keys(tables).find((table) => table.toUpperCase() == tableName)
+      ) {
+        parameters["error"] = true;
+        parameters["errorMessage"] = "No table found";
+      } else {
+        parameters["action"] = "SELECT";
+        parameters["fieldsRequired"] = fieldsRequired;
+        parameters["tableName"] = tableName;
+      }
+    } else if (command.startsWith("INSERT")) {
+      parameters["error"] = true;
+      parameters["errorMessage"] = "Invalid Command";
+    } else if (command.startsWith("UPDATE")) {
+      parameters["error"] = true;
+      parameters["errorMessage"] = "Invalid Command";
+    } else if (command.startsWith("DATE")) {
+      parameters["error"] = true;
+      parameters["errorMessage"] = "Invalid Command";
+    } else {
+      parameters["error"] = true;
+      parameters["errorMessage"] = "Invalid Command";
+    }
+    return parameters;
+  };
+  useEffect(() => {
+    history.length > 0 && console.log(commandParser(history[0].command));
+  }, [history]);
   return (
     <div style={styles.homepage}>
       <h1 style={styles.hero}>DATA PLAYGROUND</h1>
@@ -19,10 +94,35 @@ const Home = () => {
         </div>
         <div style={styles.rightPanel}>
           {/* <div style={styles.topBar}></div> */}
-          <div style={styles.terminal}>
+          <div style={styles.terminal} ref={terminalRef}>
             <p style={styles.head}>WEB SQL ACCESS, 25 MAY 2022 , 5:6 PM</p>
-            <StaticInputBar value="select * from students" />
-            <CommandResult /> <InputBar />
+            {history.map((item) => (
+              <>
+                <StaticInputBar value={item.command} key={item.id} />
+                {(function () {
+                  let parameters = commandParser(item.command);
+                  return parameters ? (
+                    parameters.error ? (
+                      <p style={styles.message}>{parameters.errorMessage}</p>
+                    ) : (
+                      parameters.action == "SELECT" && (
+                        <CommandResult
+                          tableName={parameters.tableName}
+                          tables={tables}
+                        />
+                      )
+                    )
+                  ) : (
+                    ""
+                  );
+                })()}
+              </>
+            ))}
+            <InputBar
+              history={history}
+              setHistory={setHistory}
+              scrollToBottom={scrollToBottom}
+            />
           </div>
         </div>
       </div>
@@ -82,6 +182,11 @@ const styles = {
   utility: {
     color: "#000",
     fontWeight: "bold",
+  },
+  message: {
+    color: "yellow",
+    fontSize: 12,
+    margin: 0,
   },
 };
 export default Home;

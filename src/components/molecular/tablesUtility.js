@@ -14,10 +14,6 @@ const Table = ({ name }) => {
         <div style={styles.extras}>
           <div style={styles.showCover}>
             <img src={Play} style={styles.minus} />
-            <div>Show Briefly</div>
-          </div>
-          <div style={styles.showCover}>
-            <img src={Play} style={styles.minus} />
             <div>Show All</div>
           </div>
         </div>
@@ -36,8 +32,11 @@ const TablesUtility = () => {
       </div>
       {open && (
         <div style={styles.panel}>
-          <Table name="Students" />
-          <Table name="School" />
+          <Table name="Categories" />
+          <Table name="Customers" />
+          <Table name="Products" />
+          <Table name="Shippers" />
+          <Table name="Suppliers" />
         </div>
       )}
     </>
