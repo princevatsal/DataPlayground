@@ -29,7 +29,6 @@ const Home = () => {
 
     let parameters = {};
     command = command.toUpperCase().trim();
-    console.log("parsing for ", command);
     if (command.startsWith("SELECT")) {
       // SELECT * FROM STUDENTS
       // SELECT NAME FROM STUDENTS
@@ -79,9 +78,6 @@ const Home = () => {
     }
     return parameters;
   };
-  useEffect(() => {
-    history.length > 0 && console.log(commandParser(history[0].command));
-  }, [history]);
   return (
     <div style={styles.homepage}>
       <h1 style={styles.hero}>DATA PLAYGROUND</h1>
@@ -97,9 +93,10 @@ const Home = () => {
           <div style={styles.terminal} ref={terminalRef}>
             <p style={styles.head}>WEB SQL ACCESS, 25 MAY 2022 , 5:6 PM</p>
             {history.map((item) => (
-              <>
-                <StaticInputBar value={item.command} key={item.id} />
+              <React.Fragment key={item.id}>
+                <StaticInputBar value={item.command} />
                 {(function () {
+                  console.log("rendering history");
                   let parameters = commandParser(item.command);
                   return parameters ? (
                     parameters.error ? (
@@ -109,6 +106,7 @@ const Home = () => {
                         <CommandResult
                           tableName={parameters.tableName}
                           tables={tables}
+                          fieldsRequired={parameters.fieldsRequired}
                         />
                       )
                     )
@@ -116,7 +114,7 @@ const Home = () => {
                     ""
                   );
                 })()}
-              </>
+              </React.Fragment>
             ))}
             <InputBar
               history={history}

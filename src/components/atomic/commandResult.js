@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
-const CommandResult = ({ tableName, tables }) => {
-  useEffect(() => {
-    console.log(tableName);
-  }, [tableName]);
+const CommandResult = ({ tableName, tables, fieldsRequired = "*" }) => {
   const [data, setData] = useState([]);
-
   const normalizeData = (dataList) => {
     return dataList.map((dataItem) => {
       var newItem = {};
@@ -22,8 +18,27 @@ const CommandResult = ({ tableName, tables }) => {
   };
 
   useEffect(() => {
-    setData(normalizeData(tables[tableName]));
-  }, []);
+    let normalizedData = normalizeData(tables[tableName]);
+    if (fieldsRequired.length) {
+      if (fieldsRequired[0] == "*") {
+        setData(normalizedData);
+      } else {
+        setData(
+          normalizedData.map((dataItem) => {
+            var newDataItem = {};
+            Object.keys(dataItem).forEach((key) => {
+              if (fieldsRequired.find((item) => item == key.toUpperCase())) {
+                newDataItem[key] = dataItem[key];
+              }
+            });
+            return newDataItem;
+          })
+        );
+      }
+    } else {
+      setData(normalizedData);
+    }
+  }, [tables, tableName]);
   return (
     <div
       style={
@@ -38,6 +53,7 @@ const CommandResult = ({ tableName, tables }) => {
         </div>
         <div style={styles.columns}>
           {data.length > 0 &&
+            Object.keys(data[0]).length > 0 &&
             Object.keys(data[0]).map((key, index) => (
               <p
                 style={
@@ -60,18 +76,19 @@ const CommandResult = ({ tableName, tables }) => {
       </div>
       <div style={styles.body}>
         {data.length > 0 &&
-          data.map((item) => (
-            <div style={styles.row}>
-              {Object.values(item).map((it) => (
-                <p
-                  style={{
-                    ...styles.value,
-                    minWidth: 100 / Object.keys(item).length + "%",
-                  }}
-                >
-                  {it}
-                </p>
-              ))}
+          data.map((item, index) => (
+            <div style={styles.row} key={index}>
+              {Object.values(data[0]).length > 0 &&
+                Object.values(item).map((it) => (
+                  <p
+                    style={{
+                      ...styles.value,
+                      minWidth: 100 / Object.keys(item).length + "%",
+                    }}
+                  >
+                    {it}
+                  </p>
+                ))}
             </div>
           ))}
       </div>
