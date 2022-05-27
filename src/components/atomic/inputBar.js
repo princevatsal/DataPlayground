@@ -38,7 +38,7 @@ const InputBar = ({
             parameters["errorMessage"] = "Empty Table";
           } else {
             if (condition.length > 0) {
-              if ((condition = "TRUE")) {
+              if (condition == "TRUE") {
                 var length = tables[tableName].length;
                 tables[tableName] = [];
                 setTables(tables);

@@ -38,7 +38,7 @@ const CommandResult = ({ tableName, tables, fieldsRequired = "*" }) => {
     } else {
       setData(normalizedData);
     }
-  }, [tables, tableName, fieldsRequired]);
+  }, [tables, tableName]);
   return (
     <div
       style={
