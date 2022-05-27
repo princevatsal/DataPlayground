@@ -2,41 +2,41 @@ import React, { useState } from "react";
 import Minus from "../../assets/minus.png";
 import Plus from "../../assets/plus.png";
 import Play from "../../assets/play.png";
-const Table = ({ name }) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <div style={styles.tableCover} onClick={() => setOpen((old) => !old)}>
-        <img src={open ? Minus : Plus} style={styles.minus} />
-        <div>{name}</div>
-      </div>
-      {open && (
-        <div style={styles.extras}>
-          <div style={styles.showCover}>
-            <img src={Play} style={styles.minus} />
-            <div>Show All</div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-const TablesUtility = () => {
+const TablesUtility = ({ setValue }) => {
   const [open, setOpen] = useState(true);
+  const Table = ({ name, command }) => {
+    const [OPEN, setOPEN] = useState(false);
+    return (
+      <>
+        <div style={styles.tableCover} onClick={() => setOPEN((old) => !old)}>
+          <img src={OPEN ? Minus : Plus} style={styles.minus} alt="switch" />
+          <div>{name}</div>
+        </div>
+        {OPEN && (
+          <div style={styles.extras}>
+            <div style={styles.showCover} onClick={() => setValue(command)}>
+              <img src={Play} style={styles.minus} alt="play" />
+              <div>Show All</div>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
 
   return (
     <>
       <div style={styles.utilityRow} onClick={() => setOpen((old) => !old)}>
-        <img src={open ? Minus : Plus} style={styles.minus} />
-        <p style={styles.utilityName}>TABLES</p>
+        <img src={open ? Minus : Plus} style={styles.minus} alt="switch" />
+        <p style={styles.utilityName}>SELECT</p>
       </div>
       {open && (
         <div style={styles.panel}>
-          <Table name="Categories" />
-          <Table name="Customers" />
-          <Table name="Products" />
-          <Table name="Shippers" />
-          <Table name="Suppliers" />
+          <Table name="Categories" command={"SELECT * FROM CATEGORIES"} />
+          <Table name="Customers" command={"SELECT * FROM CUSTOMERS"} />
+          <Table name="Products" command={"SELECT * FROM PRODUCTS"} />
+          <Table name="Shippers" command={"SELECT * FROM SHIPPERS"} />
+          <Table name="Suppliers" command={"SELECT * FROM SUPPLIERS"} />
         </div>
       )}
     </>

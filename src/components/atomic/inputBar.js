@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const InputBar = ({
   setHistory,
@@ -6,8 +6,9 @@ const InputBar = ({
   history,
   tables,
   setTables,
+  value,
+  setValue,
 }) => {
-  var [value, setValue] = useState("");
   const parseCommand = (command) => {
     command = command.toUpperCase().trim();
     let parameters = {};
@@ -21,7 +22,7 @@ const InputBar = ({
       // DELETE FROM CATEGORIES WHERE TRUE
       // DELETE FROM CATEGORIES WHERE NAME=Condiments
 
-      if (command.indexOf("FROM") != -1 && command.indexOf("WHERE") != -1) {
+      if (command.indexOf("FROM") !== -1 && command.indexOf("WHERE") !== -1) {
         let tableName = command
           .slice(command.indexOf("FROM") + 4, command.indexOf("WHERE"))
           .trim();
@@ -30,39 +31,39 @@ const InputBar = ({
           .trim();
         if (
           tableName.length > 0 &&
-          Object.keys(tables).find((table) => table == tableName)
+          Object.keys(tables).find((table) => table === tableName)
         ) {
           if (tables[tableName].length < 1) {
             parameters["error"] = true;
             parameters["errorMessage"] = "Empty Table";
           } else {
             if (condition.length > 0) {
-              if (condition == "TRUE") {
+              if ((condition = "TRUE")) {
                 var length = tables[tableName].length;
                 tables[tableName] = [];
                 setTables(tables);
                 parameters["error"] = true;
                 parameters["errorMessage"] =
                   "Delete successfull. Rows effected: " + length;
-              } else if (condition == "FALSE") {
+              } else if (condition === "FALSE") {
                 parameters["error"] = true;
                 parameters["errorMessage"] =
                   "Delete successfull. Rows effected: 0";
               } else {
                 var params = condition.split("=").map((i) => i.trim());
                 if (
-                  params.length == 2 &&
+                  params.length === 2 &&
                   params[0].length > 0 &&
                   params[1].length > 0
                 ) {
                   let attr = Object.keys(tables[tableName][0]).find(
-                    (key) => key.toUpperCase() == params[0].toUpperCase()
+                    (key) => key.toUpperCase() === params[0].toUpperCase()
                   );
                   if (attr) {
                     let count = 0;
                     tables[tableName] = tables[tableName].filter((dataItem) => {
                       if (
-                        (dataItem[attr] + "").toUpperCase() !=
+                        (dataItem[attr] + "").toUpperCase() !==
                         (params[1] + "").toUpperCase()
                       ) {
                         return true;
@@ -117,9 +118,9 @@ const InputBar = ({
           style={styles.input}
           value={value}
           onKeyUp={(e) => {
-            if (e.key == "Enter") {
+            if (e.key === "Enter") {
               parseCommand(value);
-            } else if (e.key == "ArrowUp") {
+            } else if (e.key === "ArrowUp") {
               history.length > 0 &&
                 setValue(history[history.length - 1].command);
             }

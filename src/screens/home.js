@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import InputBar from "../components/atomic/inputBar";
 import CommandResult from "../components/atomic/commandResult";
 import StaticInputBar from "../components/atomic/staticInputBar";
@@ -10,9 +10,11 @@ import Customers from "../assets/json/customers.json";
 import Suppliers from "../assets/json/suppliers.json";
 import Products from "../assets/json/products.json";
 import Shippers from "../assets/json/shippers.json";
+import Idea from "../assets/idea.png";
 import "../css/home.css";
 const Home = () => {
   const [history, setHistory] = useState([]);
+  var [value, setValue] = useState("");
   const terminalRef = useRef(null);
   const scrollToBottom = () => {
     terminalRef.current.scrollIntoView(false, { behavior: "smooth" });
@@ -41,10 +43,10 @@ const Home = () => {
 
       //findind fields seperated by comma between SELECT and FROM
       var fieldsRequired = command
-        .slice(6, command.indexOf("FROM") != -1 ? command.indexOf("FROM") : 0)
+        .slice(6, command.indexOf("FROM") !== -1 ? command.indexOf("FROM") : 0)
         .split(",")
         .map((i) => i.trim());
-      fieldsRequired = fieldsRequired.filter((field) => field != "");
+      fieldsRequired = fieldsRequired.filter((field) => field !== "");
 
       //finding table name after FROM
       var tableName = command
@@ -52,14 +54,14 @@ const Home = () => {
         .trim();
 
       //command validation
-      if (fieldsRequired.length == 0) {
+      if (fieldsRequired.length === 0) {
         parameters["error"] = true;
         parameters["errorMessage"] = "Please enter columns required";
-      } else if (!tableName || tableName.length == 0) {
+      } else if (!tableName || tableName.length === 0) {
         parameters["error"] = true;
         parameters["errorMessage"] = "Please enter table name";
       } else if (
-        !Object.keys(tables).find((table) => table.toUpperCase() == tableName)
+        !Object.keys(tables).find((table) => table.toUpperCase() === tableName)
       ) {
         parameters["error"] = true;
         parameters["errorMessage"] = "No table found";
@@ -87,10 +89,10 @@ const Home = () => {
       <h1 style={styles.hero}>DATA PLAYGROUND</h1>
       <div style={styles.main}>
         <div style={styles.leftPanel}>
-          <p style={styles.utility}>UTILITY BOX</p>
-          <TablesUtility />
-          <QueryUtility />
-          <HelpUtility />
+          <p style={styles.utility}>AUTO FILL</p>
+          <TablesUtility setValue={setValue} />
+          <QueryUtility setValue={setValue} />
+          <HelpUtility setValue={setValue} />
         </div>
         <div style={styles.rightPanel}>
           {/* <div style={styles.topBar}></div> */}
@@ -106,7 +108,7 @@ const Home = () => {
                       <p style={styles.message}>{parameters.errorMessage}</p>
                     ) : (
                       parameters.action &&
-                      parameters.action == "SELECT" && (
+                      parameters.action === "SELECT" && (
                         <CommandResult
                           tableName={parameters.tableName}
                           tables={tables}
@@ -126,9 +128,17 @@ const Home = () => {
               scrollToBottom={scrollToBottom}
               tables={tables}
               setTables={setTables}
+              value={value}
+              setValue={setValue}
             />
           </div>
         </div>
+      </div>
+      <div style={styles.note}>
+        <img src={Idea} style={styles.ideaIcon} alt="idea" />
+        <p style={styles.idea}>
+          Press Up Arrow for copying last command in terminal
+        </p>
       </div>
     </div>
   );
@@ -191,6 +201,20 @@ const styles = {
     color: "yellow",
     fontSize: 12,
     margin: 0,
+  },
+  note: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: "15px",
+  },
+  ideaIcon: {
+    width: "25px",
+    marginRight: "5px",
+  },
+  idea: {
+    fontSize: 15,
+    color: "orange",
   },
 };
 export default Home;

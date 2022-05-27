@@ -5,10 +5,10 @@ const CommandResult = ({ tableName, tables, fieldsRequired = "*" }) => {
     return dataList.map((dataItem) => {
       var newItem = {};
       Object.keys(dataItem).forEach((key) => {
-        if (typeof dataItem[key] != "object") {
+        if (typeof dataItem[key] !== "object") {
           newItem[key] = dataItem[key];
         } else {
-          Object.keys(dataItem[key]).map((innerKey) => {
+          Object.keys(dataItem[key]).forEach((innerKey) => {
             newItem[innerKey] = dataItem[key][innerKey];
           });
         }
@@ -20,14 +20,14 @@ const CommandResult = ({ tableName, tables, fieldsRequired = "*" }) => {
   useEffect(() => {
     let normalizedData = normalizeData(tables[tableName]);
     if (fieldsRequired.length) {
-      if (fieldsRequired[0] == "*") {
+      if (fieldsRequired[0] === "*") {
         setData(normalizedData);
       } else {
         setData(
           normalizedData.map((dataItem) => {
             var newDataItem = {};
             Object.keys(dataItem).forEach((key) => {
-              if (fieldsRequired.find((item) => item == key.toUpperCase())) {
+              if (fieldsRequired.find((item) => item === key.toUpperCase())) {
                 newDataItem[key] = dataItem[key];
               }
             });
@@ -38,7 +38,7 @@ const CommandResult = ({ tableName, tables, fieldsRequired = "*" }) => {
     } else {
       setData(normalizedData);
     }
-  }, [tables, tableName]);
+  }, [tables, tableName, fieldsRequired]);
   return (
     <div
       style={
@@ -57,7 +57,7 @@ const CommandResult = ({ tableName, tables, fieldsRequired = "*" }) => {
             Object.keys(data[0]).map((key, index) => (
               <p
                 style={
-                  index == Object.keys(data[0]).length - 1
+                  index === Object.keys(data[0]).length - 1
                     ? {
                         ...styles.col,
                         borderRight: 0,
@@ -107,7 +107,6 @@ const styles = {
     width: "100%",
     display: "flex",
     flexDirection: "column",
-    width: "100%",
   },
   headTop: {
     display: "flex",
