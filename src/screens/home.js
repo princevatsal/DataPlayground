@@ -17,36 +17,41 @@ const Home = () => {
   const scrollToBottom = () => {
     terminalRef.current.scrollIntoView(false, { behavior: "smooth" });
   };
-  const tables = {
+  var [tables, setTables] = useState({
     CATEGORIES: Categories,
     CUSTOMERS: Customers,
     SUPPLIERS: Suppliers,
     PRODUCTS: Products,
     SHIPPERS: Shippers,
-  };
-  const commandParser = (command) => {
-    //SELECT , INSERT , UPDATE , DELETE
+  });
+  const commandParser = (command, item) => {
+    //SELECT
 
     let parameters = {};
     command = command.toUpperCase().trim();
+
     if (command.startsWith("SELECT")) {
-      // SELECT * FROM STUDENTS
-      // SELECT NAME FROM STUDENTS
-      // SELECT NAME,AGE FROM STUDENTS
-      // SELECT NAME, AGE FROM STUDENTS
-      // SELECT NAME , AGE FROM STUDENTS
-      // SELECT NAME ,AGE FROM STUDNETS
-      // SELECT NAME,AGE,CLASS FROM STUDENTS
+      // SELECT * FROM CATEGORIES
+      // SELECT NAME FROM CATEGORIES
+      // SELECT NAME,DESCRIPTION FROM CATEGORIES
+      // SELECT NAME, DESCRIPTION FROM CATEGORIES
+      // SELECT NAME , DESCRIPTION FROM CATEGORIES
+      // SELECT NAME ,DESCRIPTION FROM CATEGORIES
+      // SELECT NAME,DESCRIPTION,CLASS FROM CATEGORIES
+
+      //findind fields seperated by comma between SELECT and FROM
       var fieldsRequired = command
         .slice(6, command.indexOf("FROM") != -1 ? command.indexOf("FROM") : 0)
         .split(",")
         .map((i) => i.trim());
       fieldsRequired = fieldsRequired.filter((field) => field != "");
 
+      //finding table name after FROM
       var tableName = command
         .slice(command.indexOf("FROM") + 4, command.length)
         .trim();
 
+      //command validation
       if (fieldsRequired.length == 0) {
         parameters["error"] = true;
         parameters["errorMessage"] = "Please enter columns required";
@@ -65,13 +70,12 @@ const Home = () => {
       }
     } else if (command.startsWith("INSERT")) {
       parameters["error"] = true;
-      parameters["errorMessage"] = "Invalid Command";
+      parameters["errorMessage"] = "Insert command";
     } else if (command.startsWith("UPDATE")) {
       parameters["error"] = true;
-      parameters["errorMessage"] = "Invalid Command";
-    } else if (command.startsWith("DATE")) {
-      parameters["error"] = true;
-      parameters["errorMessage"] = "Invalid Command";
+      parameters["errorMessage"] = "update Command";
+    } else if (command.startsWith("DELETE")) {
+      parameters = item;
     } else {
       parameters["error"] = true;
       parameters["errorMessage"] = "Invalid Command";
@@ -96,12 +100,12 @@ const Home = () => {
               <React.Fragment key={item.id}>
                 <StaticInputBar value={item.command} />
                 {(function () {
-                  console.log("rendering history");
-                  let parameters = commandParser(item.command);
+                  let parameters = commandParser(item.command, item);
                   return parameters ? (
                     parameters.error ? (
                       <p style={styles.message}>{parameters.errorMessage}</p>
                     ) : (
+                      parameters.action &&
                       parameters.action == "SELECT" && (
                         <CommandResult
                           tableName={parameters.tableName}
@@ -120,6 +124,8 @@ const Home = () => {
               history={history}
               setHistory={setHistory}
               scrollToBottom={scrollToBottom}
+              tables={tables}
+              setTables={setTables}
             />
           </div>
         </div>

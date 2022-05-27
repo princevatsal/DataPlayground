@@ -68,6 +68,7 @@ const CommandResult = ({ tableName, tables, fieldsRequired = "*" }) => {
                         minWidth: 100 / Object.keys(data[0]).length + "%",
                       }
                 }
+                key={key}
               >
                 {key}
               </p>
@@ -76,19 +77,20 @@ const CommandResult = ({ tableName, tables, fieldsRequired = "*" }) => {
       </div>
       <div style={styles.body}>
         {data.length > 0 &&
+          Object.values(data[0]).length > 0 &&
           data.map((item, index) => (
             <div style={styles.row} key={index}>
-              {Object.values(data[0]).length > 0 &&
-                Object.values(item).map((it) => (
-                  <p
-                    style={{
-                      ...styles.value,
-                      minWidth: 100 / Object.keys(item).length + "%",
-                    }}
-                  >
-                    {it}
-                  </p>
-                ))}
+              {Object.values(item).map((it, ind) => (
+                <p
+                  key={ind}
+                  style={{
+                    ...styles.value,
+                    minWidth: 100 / Object.keys(item).length + "%",
+                  }}
+                >
+                  {it}
+                </p>
+              ))}
             </div>
           ))}
       </div>
